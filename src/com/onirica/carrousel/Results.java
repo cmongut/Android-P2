@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
+//import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Timer;
@@ -66,7 +66,7 @@ public class Results extends Service {
     private HashMap<String, Match> retrieveMatches() {
     	HashMap<String, Match> matches = new HashMap<String, Match>();
     	try {
-    		URL url = new URL("http://192.168.1.10/matches.json");
+    		URL url = new URL("http://www.eurielec.etsit.upm.es/~fherrera/matches.json");
     		URLConnection urlConnection = url.openConnection();
     		BufferedReader in = new BufferedReader(
                                 	new InputStreamReader(
@@ -147,20 +147,31 @@ public class Results extends Service {
 		}
 		private void checkMatch(Match match) {
 			if (match.getLocalGoals() > mMatches.get(match.getId()).getLocalGoals()) {
-				notifyGoal(match.getLocalTeam(),
-						   match.getLocalTeam(), match.getLocalGoals(),
-						   match.getVisitorTeam(), match.getVisitorGoals());
+				notifyGoals(match.getLocalTeam(), match);
 			}
 			
 			if (match.getVisitorGoals() > mMatches.get(match.getId()).getVisitorGoals()) {
-				notifyGoal(match.getVisitorTeam(),
-						   match.getLocalTeam(), match.getLocalGoals(),
-						   match.getVisitorTeam(), match.getVisitorGoals());
+				notifyGoals(match.getVisitorTeam(), match);
 			}
 		}
 		
 	}
-	private void notifyGoal(String scoreTeam,
+	/*private void checkMatch(Match match) {
+		if (match.getLocalGoals() > mMatches.get(match.getId()).getLocalGoals()) {
+			notifyGoal(match.getLocalTeam(),
+					   match.getLocalTeam(), match.getLocalGoals(),
+					   match.getVisitorTeam(), match.getVisitorGoals());
+		}
+		
+		if (match.getVisitorGoals() > mMatches.get(match.getId()).getVisitorGoals()) {
+			notifyGoal(match.getVisitorTeam(),
+					   match.getLocalTeam(), match.getLocalGoals(),
+					   match.getVisitorTeam(), match.getVisitorGoals());
+		}
+	}
+	
+*/
+	/*private void notifyGoal(String scoreTeam,
             String localTeam, int localGoals,
             String visitorTeam, int visitorGoals) {
 			String titleText = scoreTeam + " Scored!";
@@ -179,6 +190,29 @@ public class Results extends Service {
 
 			mNM.notify(SCORE_NOTIFICATION_ID, notification);
 
-}
+   }*/
+	private void notifyGoals(String scoreTeam, Match match) {
+		    String localTeam = match.getLocalTeam();
+		    int localGoals = match.getLocalGoals();
+            String visitorTeam = match.getVisitorTeam();
+            int visitorGoals = match.getVisitorGoals();
+			String titleText = scoreTeam + " Scored!";
+			String contentText = scoreTeam + " Scored!\n" + localTeam + " " + localGoals + 
+              " - " + visitorTeam + " " + visitorGoals;
+			int icon = R.drawable.icon;
+			long when = System.currentTimeMillis();
+
+			Notification notification = new Notification(icon, titleText, when);
+			Context context = getApplicationContext();
+			Intent notificationIntent = new Intent(this, Results.class);
+			PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+
+			notification.setLatestEventInfo(context, titleText, contentText, contentIntent);
+
+
+			mNM.notify(" " + match.getId(), SCORE_NOTIFICATION_ID, notification);
+
+   }	
 
 }
+
